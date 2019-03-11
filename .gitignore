@@ -4,6 +4,9 @@ venv/
 # Python cache
 *.pyc
 
-# Pycharm
+# PyCharm files
 .idea/
+
+# CSV data
+*.csv
 
