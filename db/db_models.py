@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Date, Integer, create_engine
+from sqlalchemy import Column, String, Date, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -18,3 +18,28 @@ class MarriageCert(Base):
 
     Event_Place = Column(String(100))
     Event_Date = Column(Date)
+
+
+class DeathRecord(Base):
+    __tablename__ = "Data_DeathRecords"
+
+    Id = Column(Integer, primary_key=True)
+
+    FirstName = Column(String(100), nullable=False)
+    MiddleName = Column(String(100))
+    LastName = Column(String(100), nullable=False)
+
+    DeathDate = Column(Date)
+    DeathAge = Column(Integer)
+
+    BirthCity = Column(String(100))
+    BirthCountry = Column(String(100))
+    PlaceOfDeath = Column(String(100))
+
+    # Grave site location
+    # TODO: Determine lat/lng and distance between graves?
+    Block = Column(String(1), nullable=False)
+    Road = Column(String(5), nullable=False)
+    Row = Column(Integer, nullable=False)
+    Side = Column(String(1), nullable=False)
+    FullPlot = Column(String(10), nullable=False)
