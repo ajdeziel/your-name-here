@@ -1,5 +1,15 @@
+/*
+* leafletMap.js
+*
+* For creating and loading OpenStreetMap map with layer created from grave plots data within Ross Bay Cemetery.
+* Provide all map interactivity (i.e. popups, event handlers).
+*
+*/
+
 // let plotsLatLong = {[48.4107174, -123.3423201], [48.11, -123.3], [48.99, -123.6], [48.75, -124]}
 
+// Extract grave plot coordinates for each grave plot, and store in list
+// Coordinates to be used to create custom map layer over Ross Bay Cemetery
 let plotsLatLong = [];
 
 for (let count = 0; count < plotsLatLong.length; count++) {
@@ -11,6 +21,8 @@ for (let count = 0; count < plotsLatLong.length; count++) {
     });
 };
 
+// Initialize Vue instance with Leaflet.js/Mapbox/OpenStreetMap
+// Load grave plots coordinates as map layer on top of embedded OSM map from Mapbox
 let plotsLayer = new Vue({
     el: '#content',
     data: {
