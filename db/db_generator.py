@@ -85,6 +85,18 @@ def add_death_records(kml_file, db):
         birth_country = ext_data["BirthCountry"] if "BirthCountry" in ext_data else None
         place_of_death = ext_data["PlaceOfDeath"] if "PlaceOfDeath" in ext_data else None
 
+        # Process polygon points and compute centroid
+        poly_pts = set()
+        for point in points:
+            poly_pts.add((point.x, point.y))
+        poly_pts_str = " ".join([str(x) + "," + str(y) for x, y in poly_pts])
+
+        pts_x = list(map(lambda p: p[0], poly_pts))
+        centroid_x = sum(pts_x) / len(pts_x)
+
+        pts_y = list(map(lambda p: p[1], poly_pts))
+        centroid_y = sum(pts_y) / len(pts_y)
+
         death_record = DeathRecord(
             FirstName=name_first,
             MiddleName=name_middle,
@@ -98,7 +110,10 @@ def add_death_records(kml_file, db):
             Road=ext_data["Road"],
             Row=ext_data["Row"],
             Side=ext_data["Side"],
-            FullPlot=ext_data["FullPlot"]
+            FullPlot=ext_data["FullPlot"],
+            GraveSitePts=poly_pts_str,
+            GraveSiteCentroid_X=centroid_x,
+            GraveSiteCentroid_Y=centroid_y
         )
         session.add(death_record)
 

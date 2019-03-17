@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Date, Integer
+from sqlalchemy import Column, String, Date, Integer, Float
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -37,9 +37,12 @@ class DeathRecord(Base):
     PlaceOfDeath = Column(String(100))
 
     # Grave site location
-    # TODO: Determine lat/lng and distance between graves?
     Block = Column(String(1), nullable=False)
     Road = Column(String(5), nullable=False)
     Row = Column(Integer, nullable=False)
     Side = Column(String(1), nullable=False)
     FullPlot = Column(String(10), nullable=False)
+
+    GraveSitePts = Column(String(100), nullable=False)
+    GraveSiteCentroid_X = Column(Float, nullable=False)
+    GraveSiteCentroid_Y = Column(Float, nullable=False)

@@ -23,4 +23,4 @@ def read_kml_placemarks(file_name):
         simple_items = placemark.extended_data.elements[0].data
         extended_data = {x["name"]: x["value"] for x in simple_items}
 
-        yield extended_data, []
+        yield extended_data, placemark.geometry.exterior.geoms
