@@ -6,7 +6,9 @@ from sqlalchemy.orm import sessionmaker
 
 from datetime import datetime
 from db.db_models import Base, MarriageCert, DeathRecord
+from utils.kml_reader import read_kml_placemarks
 from utils.bcmuseum_miner import FIELDS as MARRIAGECERT_FIELDS
+
 
 
 @click.group()
@@ -59,46 +61,46 @@ def add_marriage_certs(csv_file, db):
 
 
 @click.command()
-@click.argument("csv_file")
+@click.argument("kml_file")
 @click.option("--db", default="proj_data.db", help="Output database file")
-def add_death_records(csv_file, db):
+def add_death_records(kml_file, db):
     session = get_db_session(db)
 
-    with open(csv_file, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            # No real useful information in row without name - ignore!
-            if row["FullName"].strip() == "":
-                continue
+    for ext_data, points in read_kml_placemarks(kml_file):
+        # No real useful information in row without name - ignore!
+        if "FullName" not in ext_data or type(ext_data["FullName"]) != str:
+            continue
 
-            name_first, name_middle, name_last = extract_name_fields(row["FullName"].strip())
+        name_first, name_middle, name_last = extract_name_fields(ext_data["FullName"].strip())
 
+        date_of_death = None
+        if "DeathYYYYMMDD" in ext_data:
             try:
-                date_of_death = datetime.strptime("%Y-%m-%d", row["DeathYYYYMMDD"])
+                date_of_death = datetime.strptime("%Y-%m-%d", str(ext_data["DeathYYYYMMDD"]))
             except ValueError:
-                date_of_death = None
+                pass
 
-            # Get birth city and country, if available
-            birth_city = row["BirthCity"] if row["BirthCity"].strip() else None
-            birth_country = row["BirthCountry"] if row["BirthCountry"].strip() else None
-            place_of_death = row["PlaceOfDeath"] if row["PlaceOfDeath"].strip() else None
+        # Get birth city and country, if available
+        birth_city = ext_data["BirthCity"] if "BirthCity" in ext_data else None
+        birth_country = ext_data["BirthCountry"] if "BirthCountry" in ext_data else None
+        place_of_death = ext_data["PlaceOfDeath"] if "PlaceOfDeath" in ext_data else None
 
-            death_record = DeathRecord(
-                FirstName=name_first,
-                MiddleName=name_middle,
-                LastName=name_last,
-                DeathDate=date_of_death,
-                DeathAge=None,  # TODO
-                BirthCity=birth_city,
-                BirthCountry=birth_country,
-                PlaceOfDeath=place_of_death,
-                Block=row["Block"],
-                Road=row["Road"],
-                Row=row["Row"],
-                Side=row["Side"],
-                FullPlot=row["FullPlot"]
-            )
-            session.add(death_record)
+        death_record = DeathRecord(
+            FirstName=name_first,
+            MiddleName=name_middle,
+            LastName=name_last,
+            DeathDate=date_of_death,
+            DeathAge=None,  # TODO
+            BirthCity=birth_city,
+            BirthCountry=birth_country,
+            PlaceOfDeath=place_of_death,
+            Block=ext_data["Block"],
+            Road=ext_data["Road"],
+            Row=ext_data["Row"],
+            Side=ext_data["Side"],
+            FullPlot=ext_data["FullPlot"]
+        )
+        session.add(death_record)
 
     session.commit()
 
