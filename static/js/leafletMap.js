@@ -1,4 +1,15 @@
-let plotsLatLong = {[48.4107174, -123.3423201],[48.11, -123.3],[48.99, -123.6],[48.75, -124]}
+// let plotsLatLong = {[48.4107174, -123.3423201], [48.11, -123.3], [48.99, -123.6], [48.75, -124]}
+
+let plotsLatLong = [];
+
+for (let count = 0; count < plotsLatLong.length; count++) {
+    plotsLatLong.push({
+        id: count,
+        name: 'Person Name',
+        type: 'polygon',
+        coords: [],
+    });
+};
 
 let plotsLayer = new Vue({
     el: '#content',
@@ -10,7 +21,7 @@ let plotsLayer = new Vue({
                 id: 0,
                 name: 'Grave Plots',
                 active: true,
-                features: [],
+                features: plotsLatLong,
             },
         ],
     },
@@ -31,6 +42,14 @@ let plotsLayer = new Vue({
 
             this.tileLayer.addTo(this.map);
         },
-        initLayers() {},
+        initLayers() {
+            this.layers.forEach((layer) => {
+               const polygonGraveFeatures = layer.features.filter(feature => feature.type === 'polygon');
+
+               polygonGraveFeatures.forEach((feature) => {
+                   feature.leafletObject = L.polygon(feature.coords).bindPopup(feature.name);
+               });
+            });
+        },
     },
 });
