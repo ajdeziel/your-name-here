@@ -24,7 +24,7 @@ for (let count = 0; count < plotsLatLong.length; count++) {
 // Initialize Vue instance with Leaflet.js/Mapbox/OpenStreetMap
 // Load grave plots coordinates as map layer on top of embedded OSM map from Mapbox
 let plotsLayer = new Vue({
-    el: '#content',
+    el: '#map',
     data: {
         map: null,
         tileLayer: null,
@@ -32,7 +32,7 @@ let plotsLayer = new Vue({
             {
                 id: 0,
                 name: 'Grave Plots',
-                active: true,
+                active: false,
                 features: plotsLatLong,
             },
         ],
@@ -45,7 +45,7 @@ let plotsLayer = new Vue({
         initMap() {
             this.map = L.map('map').setView([48.4107174,-123.3423201], 16);
 
-            this.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYWpkZXppZWwiLCJhIjoiY2p0OWx0bmRrMDFsNjQ5bnV2ZnpyNzJrMCJ9.SSwUPVKs_-Y4vJHmPpBPHA', {
+            this.tileLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYWpkZXppZWwiLCJhIjoiY2p0OWx0bmRrMDFsNjQ5bnV2ZnpyNzJrMCJ9.SSwUPVKs_-Y4vJHmPpBPHA', {
                 attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
                 maxZoom: 18,
                 id: 'mapbox.satellite',
