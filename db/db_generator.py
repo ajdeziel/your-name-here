@@ -8,6 +8,7 @@ from datetime import datetime
 from db.db_models import Base, MarriageCert, DeathRecord
 from utils.kml_reader import read_kml_placemarks
 from utils.bcmuseum_miner import FIELDS as MARRIAGECERT_FIELDS
+from utils.timeutils import parse_date
 
 
 
@@ -73,12 +74,13 @@ def add_death_records(kml_file, db):
 
         name_first, name_middle, name_last = extract_name_fields(ext_data["FullName"].strip())
 
+        # Try to parse date of death
         date_of_death = None
-        if "DeathYYYYMMDD" in ext_data:
-            try:
-                date_of_death = datetime.strptime("%Y-%m-%d", str(ext_data["DeathYYYYMMDD"]))
-            except ValueError:
-                pass
+        if "DeathYYYYMMDD" in ext_data and ext_data["DeathYYYYMMDD"] is not None:
+            date_of_death = parse_date(ext_data["DeathYYYYMMDD"])
+
+            if date_of_death is None:
+                print("WARN: Could not parse date string '%s'" % ext_data["DeathYYYYMMDD"])
 
         # Get birth city and country, if available
         birth_city = ext_data["BirthCity"] if "BirthCity" in ext_data else None
@@ -146,6 +148,16 @@ def extract_name_fields(name_str):
         return first, middle, last
     else:
         raise Exception("Can't handle name '%s'" % name_str)
+
+
+def parse_age(age_str):
+    """Parse an age in years from years, months and days. Age will be rounded
+    to the nearest year.
+
+    "Stb." indicates stillborn, which will give an age of 0 years.
+    :return {int} Age in years.
+    """
+    return None
 
 
 if __name__ == "__main__":
