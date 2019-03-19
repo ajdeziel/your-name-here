@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 import click
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -82,6 +83,11 @@ def add_death_records(kml_file, db):
             if date_of_death is None:
                 print("WARN: Could not parse date string '%s'" % ext_data["DeathYYYYMMDD"])
 
+        # Try to parse age at death (in years)
+        age_at_death = None
+        if "Age" in ext_data and ext_data["Age"] is not None:
+            age_at_death = parse_age(ext_data["Age"])
+
         # Get birth city and country, if available
         birth_city = ext_data["BirthCity"] if "BirthCity" in ext_data else None
         birth_country = ext_data["BirthCountry"] if "BirthCountry" in ext_data else None
@@ -104,7 +110,7 @@ def add_death_records(kml_file, db):
             MiddleName=name_middle,
             LastName=name_last,
             DeathDate=date_of_death,
-            DeathAge=None,  # TODO
+            DeathAge=age_at_death,
             BirthCity=birth_city,
             BirthCountry=birth_country,
             PlaceOfDeath=place_of_death,
@@ -153,11 +159,26 @@ def extract_name_fields(name_str):
 def parse_age(age_str):
     """Parse an age in years from years, months and days. Age will be rounded
     to the nearest year.
-
-    "Stb." indicates stillborn, which will give an age of 0 years.
     :return {int} Age in years.
     """
-    return None
+    # Stb. indicates stillborn, which will give an age of 0 years
+    if "stb." in age_str.lower():
+        return 0
+
+    age_years = None
+    age_years_match = re.search("(\d+) *y(ears)?", age_str)
+    if age_years_match:
+        age_years = int(age_years_match.group(1))
+
+    age_months = 0
+    age_months_match = re.search("(\d+) *m(onths)?", age_str)
+    if age_months_match:
+        age_months = int(age_months_match.group(1))
+
+    if age_years and age_months >= 6:
+        age_years += 1
+
+    return age_years
 
 
 if __name__ == "__main__":
