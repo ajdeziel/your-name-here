@@ -17,7 +17,7 @@ for (let count = 0; count < plotsLatLong.length; count++) {
         id: count,
         name: 'Person Name',
         type: 'polygon',
-        coords: [],
+        coords: {graves_coords},
     });
 };
 
