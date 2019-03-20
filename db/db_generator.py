@@ -28,7 +28,7 @@ def init_db(engine):
 def add_marriage_certs(csv_file, db):
     session = get_db_session(db)
 
-    with open(csv_file, 'r') as file:
+    with open(csv_file, 'r', encoding="latin-1") as file:
         reader = csv.DictReader(file, MARRIAGECERT_FIELDS)
         next(reader)  # skip header
 
@@ -57,7 +57,7 @@ def add_marriage_certs(csv_file, db):
                 Event_Place=event_place,
                 Event_Date=event_date
             )
-            session.add(cert)
+            session.merge(cert)
 
     session.commit()
 
@@ -123,7 +123,7 @@ def add_death_records(kml_file, db):
             GraveSiteCentroid_X=centroid_x,
             GraveSiteCentroid_Y=centroid_y
         )
-        session.add(death_record)
+        session.merge(death_record)
 
     session.commit()
 
