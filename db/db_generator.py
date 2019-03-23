@@ -2,6 +2,7 @@ import os
 import click
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.inspection import inspect
 
 from db.db_models import Base
 from scraping.deathrecords import scrape_death_records
@@ -35,7 +36,8 @@ def add_marriage_certs(csv_file, db):
 def add_death_records(kml_file, db):
     session = get_db_session(db)
 
-    for record in scrape_death_records(kml_file):
+    for person, record in scrape_death_records(kml_file):
+        session.merge(person)
         session.merge(record)
 
     session.commit()

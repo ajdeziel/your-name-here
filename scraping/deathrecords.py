@@ -1,4 +1,4 @@
-from db.db_models import DeathRecord
+from db.db_models import DeathRecord, Person
 from utils.kml_reader import read_kml_placemarks
 from scraping.utils import extract_name_fields, parse_age, parse_date
 
@@ -41,15 +41,7 @@ def scrape_death_records(kml_file):
         pts_y = list(map(lambda p: p[1], poly_pts))
         centroid_y = sum(pts_y) / len(pts_y)
 
-        yield DeathRecord(
-            FirstName=name_first,
-            MiddleName=name_middle,
-            LastName=name_last,
-            DeathDate=date_of_death,
-            DeathAge=age_at_death,
-            BirthCity=birth_city,
-            BirthCountry=birth_country,
-            PlaceOfDeath=place_of_death,
+        death_record = DeathRecord(
             Block=ext_data["Block"],
             Road=ext_data["Road"],
             Row=ext_data["Row"],
@@ -59,3 +51,17 @@ def scrape_death_records(kml_file):
             GraveSiteCentroid_X=centroid_x,
             GraveSiteCentroid_Y=centroid_y
         )
+
+        person = Person(
+            FirstName=name_first,
+            MiddleName=name_middle,
+            LastName=name_last,
+            DeathDate=date_of_death,
+            DeathAge=age_at_death,
+            BirthCity=birth_city,
+            BirthCountry=birth_country,
+            PlaceOfDeath=place_of_death,
+            DeathRecord=death_record
+        )
+
+        yield person, death_record
