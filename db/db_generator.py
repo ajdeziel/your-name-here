@@ -38,7 +38,6 @@ def add_death_records(kml_file, db):
 
     for person, record in scrape_death_records(kml_file):
         session.merge(person)
-        session.merge(record)
 
     session.commit()
 
@@ -46,8 +45,7 @@ def add_death_records(kml_file, db):
 def get_db_session(db_name):
     # Assume sqlite for now, might have to add postgres support later
     engine = create_engine("sqlite:///%s" % db_name)
-    if not os.path.exists(db_name):
-            init_db(engine)
+    init_db(engine)
 
     DBSession = sessionmaker(engine)
     DBSession.bind = engine
