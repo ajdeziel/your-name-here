@@ -8,18 +8,14 @@
 
 // let plotsLatLong = {[48.4107174, -123.3423201], [48.11, -123.3], [48.99, -123.6], [48.75, -124]}
 
-// Extract grave plot coordinates for each grave plot, and store in list
-// Coordinates to be used to create custom map layer over Ross Bay Cemetery
-let plotsLatLong = [];
-
-for (let count = 0; count < plotsLatLong.length; count++) {
-    plotsLatLong.push({
-        id: count,
-        name: 'Person Name',
-        type: 'polygon',
-        coords: {graves_coords},
-    });
-};
+// Get coords on ready state of an element
+function ready(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading"){
+        fn();
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
 
 // Initialize Vue instance with Leaflet.js/Mapbox/OpenStreetMap
 // Load grave plots coordinates as map layer on top of embedded OSM map from Mapbox
@@ -33,9 +29,12 @@ let plotsLayer = new Vue({
                 id: 0,
                 name: 'Grave Plots',
                 active: false,
-                features: plotsLatLong,
+                features: [],
             },
         ],
+    },
+    created() {
+        fetch("/graves").then(this.populateFeatures);
     },
     mounted() {
         this.initMap();
@@ -63,5 +62,16 @@ let plotsLayer = new Vue({
                });
             });
         },
+        populateFeatures(response) {
+            if (response.code !== 200)
+                console.log("Failed to get grave information!")
+
+            response.json().then(function(data) {
+                this.features = data;
+                console.log("Done loading features data.")
+            }).catch(function() {
+                console.log("Failed to parse incoming JSON data.")
+            })
+        }
     },
 });

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import json
 import os
 from sqlalchemy import create_engine
@@ -15,29 +15,22 @@ DBSession.configure(bind=db_engine)
 session = DBSession()
 
 
+@app.route('/graves')
+def get_graves():
+    graves_coords = session.query(DeathRecord.GraveSiteCentroid_X, DeathRecord.GraveSiteCentroid_Y).all()
+
+    # AWWWWWWWWWW YEAAAAAAAH (...sorry Cam)
+    graves_coords_json = json.dumps([{"x": cx, "y": cy} for cx, cy in graves_coords])
+    return jsonify(graves_coords_json)
+
+
 @app.route('/')
 def main():
     """
     When site is first requested, load the index home page.
     :return: Index HTML template
     """
-    graves_coords = session.query(DeathRecord.GraveSiteCentroid_X, DeathRecord.GraveSiteCentroid_Y).all()
-
-    # AWWWWWWWWWW YEAAAAAAAH (...sorry Cam)
-    graves_coords_json = json.dumps([{"x": cx, "y": cy} for cx, cy in graves_coords])
-
-    # marriage_certs_query = session.query(mc).select_from(MarriageCert.__tablename__)
-
-    # print(graves_coords)
-    # for pts_row, in graves_coords:
-    #     print(pts_row)
-    #     # Grave coordinates in the form of [[coord1_1,coord1_2,..., coord1_4 coord2_1,coord2_2,...coord2_4]
-    #     graves_coords_raw = pts_row.split(' ')
-    #     for grave in graves_coords_raw:
-    #         plot_coords = list(map(float, grave.split(',')))
-    #         graves_coords.append(plot_coords)
-
-    return render_template('index.html', graves_coords=graves_coords_json)
+    return render_template('index.html')
 
     # return render_template('index.html')
 
