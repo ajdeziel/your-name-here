@@ -17,6 +17,7 @@ class Person(Base):
     # Death record info
     DeathDate = Column(Date)
     DeathAge = Column(Integer)
+    EstBirthYear = Column(Integer)
     BirthCity = Column(String(100))
     BirthCountry = Column(String(100))
     PlaceOfDeath = Column(String(100))
