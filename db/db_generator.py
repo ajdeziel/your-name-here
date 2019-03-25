@@ -2,9 +2,8 @@ import os
 import click
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.inspection import inspect
 
-from db.db_models import Base
+from db.db_models import Base, Person
 from scraping.deathrecords import scrape_death_records
 from scraping.marriagecerts import scrape_marriagecerts_csv
 
@@ -37,6 +36,18 @@ def add_death_records(kml_file, db):
     session = get_db_session(db)
 
     for person, record in scrape_death_records(kml_file):
+        existing_record = session.query(Person).filter(Person.FirstName == person.FirstName,
+                                                       Person.LastName == person.LastName,
+                                                       Person.DeathRecord.has(FullPlot=record.FullPlot))
+
+        # We sometimes get duplicates from this dataset. If the record has the same
+        # first name, last name and plot ID then we can safely ignore it.
+        # TODO: merge these entries to get complete information!
+        if session.query(existing_record.exists()).scalar():
+            print("Ignoring duplicate record for '%s %s' at FullPlot '%s'"
+                  % (person.FirstName, person.LastName, person.DeathRecord.FullPlot))
+            continue
+
         session.merge(person)
 
     session.commit()
