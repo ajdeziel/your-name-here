@@ -53,8 +53,8 @@ def scrape_death_records(kml_file):
             Side=ext_data["Side"],
             FullPlot=ext_data["FullPlot"],
             GraveSitePts=poly_pts_str,
-            GraveSiteCentroid_X=centroid_x,
-            GraveSiteCentroid_Y=centroid_y
+            GraveSiteCentroid_Long=centroid_x,
+            GraveSiteCentroid_Lat=centroid_y
         )
 
         person = Person(

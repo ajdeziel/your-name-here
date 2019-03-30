@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Date, Integer, Float, ForeignKey
+from sqlalchemy import (
+    Column, String, Date, Integer, Float, ForeignKey, UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -23,11 +24,16 @@ class Person(Base):
     PlaceOfDeath = Column(String(100))
 
     # Foreign keys
+    FamilyCluster_Id = Column(Integer, ForeignKey("Data_FamilyClusters.Id"))
     MarriageCert_Id = Column(Integer, ForeignKey("Data_MarriageCerts.Id"))
     DeathRecord_Id = Column(Integer, ForeignKey("Data_DeathRecords.Id"))
 
     # Relationships
+    FamilyCluster = relationship("FamilyCluster", uselist=False, back_populates="People")
     DeathRecord = relationship("DeathRecord", uselist=False, back_populates="Person")
+
+    def __repr__(self):
+        return "%s %s" % (self.FirstName, self.LastName)
 
 
 class MarriageCert(Base):
@@ -54,7 +60,21 @@ class DeathRecord(Base):
     FullPlot = Column(String(10), nullable=False)
 
     GraveSitePts = Column(String(100), nullable=False)
-    GraveSiteCentroid_X = Column(Float, nullable=False)
-    GraveSiteCentroid_Y = Column(Float, nullable=False)
+    GraveSiteCentroid_Long = Column(Float, nullable=False)
+    GraveSiteCentroid_Lat = Column(Float, nullable=False)
 
     Person = relationship("Person", back_populates="DeathRecord")
+
+
+class FamilyCluster(Base):
+    __tablename__ = "Data_FamilyClusters"
+
+    Id = Column(Integer, primary_key=True)
+    Centroid_Long = Column(Float, nullable=False)
+    Centroid_Lat = Column(Float, nullable=False)
+    NumPeople = Column(Integer, nullable=False)
+
+    People = relationship("Person", back_populates="FamilyCluster")
+
+    def centroid(self):
+        return self.Centroid_Lat, self.Centroid_Long

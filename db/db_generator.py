@@ -1,9 +1,7 @@
-import os
 import click
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from db.db_models import Base, Person
+from db.db_models import Person
+from db.db_utils import get_db_session
 from scraping.deathrecords import scrape_death_records
 from scraping.marriagecerts import scrape_marriagecerts_csv
 
@@ -11,10 +9,6 @@ from scraping.marriagecerts import scrape_marriagecerts_csv
 @click.group()
 def cli():
     pass
-
-
-def init_db(engine):
-    Base.metadata.create_all(engine)
 
 
 @click.command()
@@ -51,17 +45,6 @@ def add_death_records(kml_file, db):
         session.merge(person)
 
     session.commit()
-
-
-def get_db_session(db_name):
-    # Assume sqlite for now, might have to add postgres support later
-    engine = create_engine("sqlite:///%s" % db_name)
-    init_db(engine)
-
-    DBSession = sessionmaker(engine)
-    DBSession.bind = engine
-
-    return DBSession()
 
 
 if __name__ == "__main__":
