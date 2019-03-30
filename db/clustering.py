@@ -15,7 +15,13 @@ def merge_clusters(c1: FamilyCluster, c2: FamilyCluster):
     cy = (c1.Centroid_Lat * c1.NumPeople + c2.Centroid_Lat * c2.NumPeople) / num_people
 
     cluster = FamilyCluster(Centroid_Long=cx, Centroid_Lat=cy, NumPeople=num_people)
-    cluster.people = c1.People.extend(c2.People)
+
+    # For some reason, sqlalchemy relationships don't seem to like the extend()
+    # function, so implementing this manually.
+    # When for loops stop working, trust no one. (* x files theme plays... *)
+    cluster.People = c1.People
+    for i in range(c2.NumPeople):
+        cluster.People.append(c2.People[0])
 
     return cluster
 
@@ -31,7 +37,8 @@ def cluster_group(group: List[Person]):
         cluster = FamilyCluster(
             Centroid_Long=person.DeathRecord.GraveSiteCentroid_Long,
             Centroid_Lat=person.DeathRecord.GraveSiteCentroid_Lat,
-            NumPeople=1
+            NumPeople=1,
+            People=[person]
         )
 
         clusters.append(cluster)
@@ -53,6 +60,8 @@ def cluster_group(group: List[Person]):
                 if distance < closest_distance:
                     closest_distance = distance
                     c1, c2 = clusters[i], clusters[j]
+
+        # print("Best: %f c1: %s c2: %s" % (closest_distance, str(c1.People), str(c2.People)))
 
         if closest_distance < 10:
             merged = merge_clusters(c1, c2)
@@ -76,8 +85,8 @@ def do_clustering(session):
         print("\tFound %d people." % len(same_last_name))
 
         clusters = cluster_group(same_last_name)
-        for person in same_last_name:
-            session.merge(person)
+        for cluster in clusters:
+            session.merge(cluster)
 
         print("\tFound %d clusters" % len(clusters))
 
