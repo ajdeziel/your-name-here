@@ -41,6 +41,11 @@ def scrape_death_records(kml_file):
         pts_y = list(map(lambda p: p[1], poly_pts))
         centroid_y = sum(pts_y) / len(pts_y)
 
+        # If we have a date of death and age at death, estimate the person's birth year
+        est_birth_year = None
+        if date_of_death and age_at_death:
+            est_birth_year = date_of_death.year - age_at_death
+
         death_record = DeathRecord(
             Block=ext_data["Block"],
             Road=ext_data["Road"],
@@ -48,8 +53,8 @@ def scrape_death_records(kml_file):
             Side=ext_data["Side"],
             FullPlot=ext_data["FullPlot"],
             GraveSitePts=poly_pts_str,
-            GraveSiteCentroid_X=centroid_x,
-            GraveSiteCentroid_Y=centroid_y
+            GraveSiteCentroid_Long=centroid_x,
+            GraveSiteCentroid_Lat=centroid_y
         )
 
         person = Person(
@@ -61,7 +66,8 @@ def scrape_death_records(kml_file):
             BirthCity=birth_city,
             BirthCountry=birth_country,
             PlaceOfDeath=place_of_death,
-            DeathRecord=death_record
+            DeathRecord=death_record,
+            EstBirthYear=est_birth_year
         )
 
         yield person, death_record

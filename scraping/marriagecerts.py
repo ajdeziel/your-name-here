@@ -5,7 +5,7 @@ genealogy database.
 
 import csv
 from datetime import datetime
-from db.db_models import MarriageCert
+from db.db_models import MarriageCert, Person
 from scraping.utils import extract_name_fields
 from utils.bcmuseum_miner import FIELDS
 
