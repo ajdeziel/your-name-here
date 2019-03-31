@@ -23,6 +23,10 @@ class Person(Base):
     BirthCountry = Column(String(100))
     PlaceOfDeath = Column(String(100))
 
+    # Generation number: in discovered family, which generation are you from?
+    # 0 being earliest
+    GenerationNumber = Column(Integer)
+
     # Foreign keys
     FamilyCluster_Id = Column(Integer, ForeignKey("Data_FamilyClusters.Id"))
     MarriageCert_Id = Column(Integer, ForeignKey("Data_MarriageCerts.Id"))
