@@ -1,26 +1,28 @@
 from flask import Flask, render_template, jsonify
-import json
+from flask_sqlalchemy import SQLAlchemy
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker, scoped_session
 
 from db.db_models import MarriageCert, DeathRecord
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db/proj_data.db'
+db = SQLAlchemy(app)
 
 # Create global SQLAlchemy DB Session
-DBSession = sessionmaker()
-db_engine = create_engine('sqlite:///./db/proj_data.db')  #TODO: Remember to swap over to PostgreSQL later!
-DBSession.configure(bind=db_engine)
-session = DBSession()
+# db_engine = create_engine('sqlite:///./db/proj_data.db')  #TODO: Remember to swap over to PostgreSQL later!
+# DBSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=db_engine))
+# DBSession.configure(bind=db_engine)
+# session = DBSession()
 
 
 @app.route('/graves')
 def get_graves():
-    graves_coords = session.query(DeathRecord.GraveSiteCentroid_X, DeathRecord.GraveSiteCentroid_Y).all()
+    graves_coords = db.session.query(DeathRecord.GraveSiteCentroid_Long, DeathRecord.GraveSiteCentroid_Lat).all()
 
     # AWWWWWWWWWW YEAAAAAAAH (...sorry Cam)
-    graves_coords_json = json.dumps([{"x": cx, "y": cy} for cx, cy in graves_coords])
+    graves_coords_json = [{"latitude": g_lat, "longitude": g_long} for g_lat, g_long in graves_coords]
     return jsonify(graves_coords_json)
 
 

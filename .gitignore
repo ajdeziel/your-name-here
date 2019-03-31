@@ -13,3 +13,5 @@ venv/
 # Generated database files
 *.db
 
+# KML files
+*.kml
