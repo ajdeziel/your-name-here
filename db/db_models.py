@@ -63,6 +63,8 @@ class DeathRecord(Base):
     GraveSiteCentroid_Long = Column(Float, nullable=False)
     GraveSiteCentroid_Lat = Column(Float, nullable=False)
 
+    Arcgis_OID = Column(String(100), nullable=False)
+
     Person = relationship("Person", back_populates="DeathRecord")
 
 
