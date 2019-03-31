@@ -31,8 +31,8 @@ def scrape_death_records(kml_file):
 
         # Process polygon points and compute centroid
         poly_pts = set()
-        for point in points:
-            poly_pts.add((point.x, point.y))
+        for px, py in points:
+            poly_pts.add((px, py))
         poly_pts_str = " ".join([str(x) + "," + str(y) for x, y in poly_pts])
 
         pts_x = list(map(lambda p: p[0], poly_pts))
@@ -54,7 +54,8 @@ def scrape_death_records(kml_file):
             FullPlot=ext_data["FullPlot"],
             GraveSitePts=poly_pts_str,
             GraveSiteCentroid_Long=centroid_x,
-            GraveSiteCentroid_Lat=centroid_y
+            GraveSiteCentroid_Lat=centroid_y,
+            Arcgis_OID=ext_data["OBJECTID"] if "OBJECTID" in ext_data else ext_data["OBJECTID_1"]
         )
 
         person = Person(
