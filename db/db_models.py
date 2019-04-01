@@ -19,8 +19,10 @@ class Person(Base):
     DeathDate = Column(Date)
     DeathAge = Column(Integer)
     EstBirthYear = Column(Integer)
-    PlaceOfBirth = Column(String(100))
-    PlaceOfDeath = Column(String(100))
+
+    # Original description of places of birth and death from dataset
+    PlaceOfBirth_Desc = Column(String(100))
+    PlaceOfDeath_Desc = Column(String(100))
 
     # Generation number: in discovered family, which generation are you from?
     # 0 being earliest
@@ -30,10 +32,14 @@ class Person(Base):
     FamilyCluster_Id = Column(Integer, ForeignKey("Data_FamilyClusters.Id"))
     MarriageCert_Id = Column(Integer, ForeignKey("Data_MarriageCerts.Id"))
     DeathRecord_Id = Column(Integer, ForeignKey("Data_DeathRecords.Id"))
+    PlaceOfBirth_Id = Column(Integer, ForeignKey("Data_Places.Id"))
+    PlaceOfDeath_Id = Column(Integer, ForeignKey("Data_Places.Id"))
 
     # Relationships
     FamilyCluster = relationship("FamilyCluster", uselist=False, back_populates="People")
     DeathRecord = relationship("DeathRecord", uselist=False, back_populates="Person")
+    PlaceOfBirth = relationship("Place", foreign_keys=PlaceOfBirth_Id)
+    PlaceOfDeath = relationship("Place", foreign_keys=PlaceOfDeath_Id)
 
     def __repr__(self):
         return "%s %s" % (self.FirstName, self.LastName)
@@ -83,3 +89,12 @@ class FamilyCluster(Base):
 
     def centroid(self):
         return self.Centroid_Lat, self.Centroid_Long
+
+
+class Place(Base):
+    __tablename__ = "Data_Places"
+
+    Id = Column(Integer, primary_key=True)
+    Name = Column(String(100), nullable=False)
+    Lat = Column(Float, nullable=False)
+    Long = Column(Float, nullable=False)

@@ -4,6 +4,7 @@ Gets long/lat coordinates from city names using Mapbox's geocoding api.
 
 import os
 import requests
+from utils.country_codes import get_country_code
 
 MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY")
 

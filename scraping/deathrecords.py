@@ -74,8 +74,8 @@ def scrape_death_records(kml_file):
             LastName=name_last,
             DeathDate=date_of_death,
             DeathAge=age_at_death,
-            PlaceOfBirth=place_of_birth,
-            PlaceOfDeath=place_of_death,
+            PlaceOfBirth_Desc=place_of_birth,
+            PlaceOfDeath_Desc=place_of_death,
             DeathRecord=death_record,
             EstBirthYear=est_birth_year
         )

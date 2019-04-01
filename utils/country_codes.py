@@ -257,7 +257,7 @@ country_codes = dict((v, k) for k, v in country_names.items())
 def get_country_code(country_name: str):
     # Scotland is pretty common in our dataset. If we see Scotland, translate
     # it directly to Great Britain's country code.
-    if country_name.upper() == "SCOTLAND":
+    if country_name.upper() in ["SCOTLAND", "ENGLAND"]:
         return "GB"
 
     return country_codes[country_name.title()]
