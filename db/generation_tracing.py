@@ -58,5 +58,6 @@ def trace_generations(session):
 
 
 if __name__ == "__main__":
-    sessions = get_db_session(sys.argv[1])
-    trace_generations(sessions)
+    session = get_db_session(sys.argv[1])
+    trace_generations(session)
+    session.commit()
