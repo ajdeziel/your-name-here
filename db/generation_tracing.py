@@ -55,6 +55,7 @@ def trace_generations(session):
         for cluster in clusters:
             for person in cluster.people:
                 person.GenerationNumber = gen_num
+            gen_num += 1
 
 
 if __name__ == "__main__":
