@@ -15,3 +15,6 @@ venv/
 
 # KML files
 *.kml
+
+# ZIP files
+*.zip

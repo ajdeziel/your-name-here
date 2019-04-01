@@ -7,6 +7,7 @@ import random
 from db.db_models import Person, FamilyCluster
 from db.db_utils import get_db_session
 
+import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
