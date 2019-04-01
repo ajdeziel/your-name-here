@@ -36,7 +36,7 @@ def trace_generations(session):
             best_distance = float("inf")
             c1, c2 = clusters[0], clusters[1]
             for i in range(len(clusters)):
-                for j in range(i, len(clusters)):
+                for j in range(i + 1, len(clusters)):
                     dist = abs(clusters[i].mean_year - clusters[j].mean_year)
                     if dist < best_distance:
                         best_distance = dist
