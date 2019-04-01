@@ -19,8 +19,7 @@ class Person(Base):
     DeathDate = Column(Date)
     DeathAge = Column(Integer)
     EstBirthYear = Column(Integer)
-    BirthCity = Column(String(100))
-    BirthCountry = Column(String(100))
+    PlaceOfBirth = Column(String(100))
     PlaceOfDeath = Column(String(100))
 
     # Generation number: in discovered family, which generation are you from?

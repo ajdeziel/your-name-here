@@ -27,6 +27,16 @@ def scrape_death_records(kml_file):
         # Get birth city and country, if available
         birth_city = ext_data["BirthCity"] if "BirthCity" in ext_data else None
         birth_country = ext_data["BirthCountry"] if "BirthCountry" in ext_data else None
+
+        if birth_city and birth_country:
+            place_of_birth = "%s, %s" % (birth_city, birth_country)
+        elif birth_country:
+            place_of_birth = birth_country
+        elif birth_city:
+            place_of_birth = birth_city
+        else:
+            place_of_birth = None
+
         place_of_death = ext_data["PlaceOfDeath"] if "PlaceOfDeath" in ext_data else None
 
         # Process polygon points and compute centroid
@@ -64,8 +74,7 @@ def scrape_death_records(kml_file):
             LastName=name_last,
             DeathDate=date_of_death,
             DeathAge=age_at_death,
-            BirthCity=birth_city,
-            BirthCountry=birth_country,
+            PlaceOfBirth=place_of_birth,
             PlaceOfDeath=place_of_death,
             DeathRecord=death_record,
             EstBirthYear=est_birth_year
