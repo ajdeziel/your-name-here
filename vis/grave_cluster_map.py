@@ -9,31 +9,46 @@ from db.db_utils import get_db_session
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
+from shapely.geometry import Point
 
 
 def show_clusters(session):
     num_records = session.query(Person).count()
 
-    hot = plt.get_cmap("hot")
-    cNorm = colors.Normalize(vmin=0, vmax=1000)
-    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=hot)
+    colour_map = plt.get_cmap("hsv")
+    c_norm = colors.Normalize(vmin=0, vmax=10000)
+    scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=colour_map)
+
+    fig, ax = plt.subplots()
+    ax.set_aspect("equal")
+
+    ross_bay_cemetery_map = gpd.read_file('./shapes/ross_bay_cemetery_plot_grid.dbf')
+    ross_bay_cemetery_map.plot(ax=ax)
 
     num_plotted = 0
-    for cluster in session.query(FamilyCluster).all():
-        x = np.ndarray(len(cluster.People))
-        y = np.ndarray(len(cluster.People))
+    for cluster in session.query(FamilyCluster):
+        cluster_pts = []
+        # x = np.ndarray(len(cluster.People))
+        # y = np.ndarray(len(cluster.People))
 
         for i, person in enumerate(cluster.People):
-            x[i] = person.DeathRecord.GraveSiteCentroid_Long
-            y[i] = person.DeathRecord.GraveSiteCentroid_Lat
+            x = person.DeathRecord.GraveSiteCentroid_Long
+            y = person.DeathRecord.GraveSiteCentroid_Lat
             # print(x[i], y[i])
+            cluster_pts.append((y, x))
 
         if len(cluster.People) > 0:
-            plt.scatter(x, y, color=scalarMap.to_rgba(random.randint(1, 1000)))
+            clusters = gpd.GeoSeries([Point(lat, long) for lat, long in cluster_pts])
+            clusters.plot(ax=ax, color=scalar_map.to_rgba(random.randint(1, 10000)))
             num_plotted += 1
+
+        # if len(cluster.People) > 0:
+        #     plt.scatter(x, y, color=scalar_map.to_rgba(random.randint(1, 10000)))
+        #     num_plotted += 1
 
         if num_plotted == 1000:
             break
