@@ -13,7 +13,7 @@ class GenerationCluster:
         self.mean_year = person.EstBirthYear
 
     def merge(self, c2):
-        self.mean_year = (self.mean_year * len(self.people)) + (c2.mean_year * len(c2.people)) \
+        self.mean_year = ((self.mean_year * len(self.people)) + (c2.mean_year * len(c2.people))) \
                          / (len(self.people) + len(c2.people))
         self.people.extend(c2.people)
 
@@ -42,14 +42,16 @@ def trace_generations(session):
                         best_distance = dist
                         c1, c2 = clusters[i], clusters[j]
 
-            # Cluster radius: 10 years
-            if best_distance >= 10:
+            # Cluster radius: 18 years
+            # We assume 18 years is the earliest age someone would have a child (hence starting
+            # a new generation).
+            if best_distance >= 18:
                 break
 
             c1.merge(c2)
             clusters.remove(c2)
 
-        clusters.sort(key=lambda x: x.mean_year)
+        clusters.sort(key=lambda x: x.mean_year)  # sort by mean date, earliest to latest
         print("\t* Found %d generations" % len(clusters))
         gen_num = 0
         for cluster in clusters:
