@@ -26,7 +26,7 @@ def merge_clusters(c1: FamilyCluster, c2: FamilyCluster):
     return cluster
 
 
-def cluster_group(group: List[Person]):
+def cluster_group(session, group: List[Person]):
     """Cluster a group of people by the geographic proximity of their grave sites.
     We say a group of people is "close" if they are within 2 plots of each other.
     """
@@ -34,15 +34,15 @@ def cluster_group(group: List[Person]):
     # Initialize a family cluster for each person
     clusters = []
     for person in group:
-        cluster = FamilyCluster(
-            Centroid_Long=person.DeathRecord.GraveSiteCentroid_Long,
-            Centroid_Lat=person.DeathRecord.GraveSiteCentroid_Lat,
-            NumPeople=1,
-            People=[person]
-        )
+        if person.FamilyCluster is None:
+            person.FamilyCluster = FamilyCluster(
+                Centroid_Long=person.DeathRecord.GraveSiteCentroid_Long,
+                Centroid_Lat=person.DeathRecord.GraveSiteCentroid_Lat,
+                NumPeople=1,
+                People=[person]
+            )
 
-        clusters.append(cluster)
-        person.FamilyCluster = cluster
+        clusters.append(person.FamilyCluster)
 
     # Merge clusters until nearest cluster is below threshold
     while True:
@@ -84,14 +84,26 @@ def do_clustering(session):
         same_last_name = session.query(Person).filter(Person.LastName == last_name).all()
         print("\tFound %d people." % len(same_last_name))
 
-        clusters = cluster_group(same_last_name)
+        clusters = cluster_group(session, same_last_name)
         for cluster in clusters:
             session.merge(cluster)
 
         print("\tFound %d clusters" % len(clusters))
 
 
+def post_process(session):
+    print("Post-processing...")
+
+    # Post-processing step: remove "zombied" clusters from the database. These are
+    # left behind by SQLAlchemy when we merge clusters.
+    for cluster in session.query(FamilyCluster).all():
+        q = session.query(Person).filter(Person.FamilyCluster_Id == cluster.Id).exists()
+        if not session.query(q).scalar():
+            session.delete(cluster)
+
+
 if __name__ == "__main__":
     session = get_db_session(sys.argv[1])
     do_clustering(session)
+    post_process(session)
     session.commit()
