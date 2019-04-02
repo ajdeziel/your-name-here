@@ -35,7 +35,7 @@ def show_clusters(session):
         data.append((lastname, cluster_id, clusters_colors[cluster_id], Point(gs_lng, gs_lat)))
 
     pts_df = gpd.GeoDataFrame(data, columns=["LastName", "ClusterId", "ColorId", "Geometry"], geometry="Geometry")
-    pts_df.plot(ax=ax, column="ColorId", cmap="hsv")
+    pts_df.plot(ax=ax, column="ColorId", cmap="hsv", marker=".")
 
     plt.show()
 
