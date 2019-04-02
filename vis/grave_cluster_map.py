@@ -8,8 +8,6 @@ from db.db_models import Person, FamilyCluster
 from db.db_utils import get_db_session
 
 import geopandas as gpd
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
@@ -26,7 +24,7 @@ def show_clusters(session):
     fig, ax = plt.subplots()
     ax.set_aspect("equal")
 
-    ross_bay_cemetery_map = gpd.read_file('./shapes/ross_bay_cemetery_plot_grid.dbf')
+    ross_bay_cemetery_map = gpd.read_file('./shapes/Ross_Bay_Cemetery_Plot_Grid_WGS84.shp')
     ross_bay_cemetery_map.plot(ax=ax)
 
     num_plotted = 0
@@ -42,7 +40,7 @@ def show_clusters(session):
             cluster_pts.append((y, x))
 
         if len(cluster.People) > 0:
-            clusters = gpd.GeoSeries([Point(lat, long) for lat, long in cluster_pts])
+            clusters = gpd.GeoSeries([Point(long, lat) for lat, long in cluster_pts])
             clusters.plot(ax=ax, color=scalar_map.to_rgba(random.randint(1, 10000)))
             num_plotted += 1
 
