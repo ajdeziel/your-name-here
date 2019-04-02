@@ -1,3 +1,4 @@
+import datetime
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import LineString
@@ -27,16 +28,28 @@ def trace_origin(session, family_name):
     cities_death_coords = session.query(Place.Lat, Place.Long).join(Person.PlaceOfDeath)\
         .filter(Person.LastName == family_name.upper())
 
+    # Get all years of death for family records
+    person_death = session.query(Person.DeathDate).filter(Person.LastName == family_name.upper()).all()
+    death_years = [x.year if x is not None else 0 for x, in person_death]
+
     cities_birth = [(lat, long) for lat, long in cities_birth_coords]
     cities_death = [(lat, long) for lat, long in cities_death_coords]
 
+    # cities_geo = zip(cities_birth, cities_death, person_death.year)
     cities_geo = zip(cities_birth, cities_death)
 
-    # Map respective family member's place of birth to place of death
-    cities = gpd.GeoSeries([LineString([(lat_b, long_b), (lat_d, long_d)])
-                            for (lat_b, long_b), (lat_d, long_d) in cities_geo])
+    cities_lines = [LineString([(lat_b, long_b), (lat_d, long_d)]) for (lat_b, long_b), (lat_d, long_d) in cities_geo]
 
-    cities.plot(ax=ax, color='black')
+    data = zip(cities_lines, death_years)
+
+    # Map respective family member's place of birth to place of death
+    # Use death year as colour identifier
+    cities = gpd.GeoDataFrame(data, columns=["OriginLine", "ColourId"], geometry="OriginLine")
+    cities.plot(ax=ax, column="ColourId", cmap="hsv")
+    # cities = gpd.GeoSeries([LineString([(lat_b, long_b), (lat_d, long_d)])
+    #                         for (lat_b, long_b), (lat_d, long_d) in cities_geo])
+
+    # cities.plot(ax=ax, color='black')
     plt.show()
 
 
