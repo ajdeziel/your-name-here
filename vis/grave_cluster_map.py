@@ -4,7 +4,8 @@ Color-coded map of family clusters in the database.
 
 import sys
 import random
-from db.db_models import Person, FamilyCluster
+import numpy as np
+from db.db_models import Person, FamilyCluster, DeathRecord
 from db.db_utils import get_db_session
 
 import geopandas as gpd
@@ -15,41 +16,26 @@ from shapely.geometry import Point
 
 
 def show_clusters(session):
-    num_records = session.query(Person).count()
-
-    colour_map = plt.get_cmap("hsv")
-    c_norm = colors.Normalize(vmin=0, vmax=10000)
-    scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=colour_map)
-
     fig, ax = plt.subplots()
     ax.set_aspect("equal")
 
     ross_bay_cemetery_map = gpd.read_file('./shapes/Ross_Bay_Cemetery_Plot_Grid_WGS84.shp')
     ross_bay_cemetery_map.plot(ax=ax)
 
-    num_plotted = 0
-    for cluster in session.query(FamilyCluster):
-        cluster_pts = []
-        # x = np.ndarray(len(cluster.People))
-        # y = np.ndarray(len(cluster.People))
+    q = session.query(Person.LastName, Person.FamilyCluster_Id,
+                DeathRecord.GraveSiteCentroid_Lat, DeathRecord.GraveSiteCentroid_Long)\
+                .join(DeathRecord.Person)
 
-        for i, person in enumerate(cluster.People):
-            x = person.DeathRecord.GraveSiteCentroid_Long
-            y = person.DeathRecord.GraveSiteCentroid_Lat
-            # print(x[i], y[i])
-            cluster_pts.append((y, x))
+    i = 0
+    count = q.count()
+    x, y = np.zeros(count, dtype=np.float64), np.zeros(count, dtype=np.float64)
+    # cmap = cmx.rainbow(np.linspace(0, count))
+    for lastname, cluster_id, gs_lat, gs_lng in q:
+        x[i] = gs_lng
+        y[i] = gs_lat
+        i += 1
 
-        if len(cluster.People) > 0:
-            clusters = gpd.GeoSeries([Point(long, lat) for lat, long in cluster_pts])
-            clusters.plot(ax=ax, color=scalar_map.to_rgba(random.randint(1, 10000)))
-            num_plotted += 1
-
-        # if len(cluster.People) > 0:
-        #     plt.scatter(x, y, color=scalar_map.to_rgba(random.randint(1, 10000)))
-        #     num_plotted += 1
-
-        if num_plotted == 1000:
-            break
+    plt.scatter(x, y, color='red')
 
     plt.show()
 

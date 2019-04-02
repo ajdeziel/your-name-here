@@ -9,7 +9,7 @@ def init_db(engine):
 
 def get_db_session(db_name):
     # Assume sqlite for now, might have to add postgres support later
-    engine = create_engine("sqlite:///%s" % db_name)
+    engine = create_engine("sqlite:///%s" % db_name, echo=True)
     init_db(engine)
 
     DBSession = sessionmaker(engine)
