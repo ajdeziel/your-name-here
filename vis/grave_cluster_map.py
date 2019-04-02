@@ -4,14 +4,12 @@ Color-coded map of family clusters in the database.
 
 import sys
 import random
-import numpy as np
 from db.db_models import Person, FamilyCluster, DeathRecord
 from db.db_utils import get_db_session
 
+import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-import matplotlib.cm as cmx
 from shapely.geometry import Point
 
 
@@ -26,16 +24,18 @@ def show_clusters(session):
                 DeathRecord.GraveSiteCentroid_Lat, DeathRecord.GraveSiteCentroid_Long)\
                 .join(DeathRecord.Person)
 
-    i = 0
     count = q.count()
-    x, y = np.zeros(count, dtype=np.float64), np.zeros(count, dtype=np.float64)
-    # cmap = cmx.rainbow(np.linspace(0, count))
-    for lastname, cluster_id, gs_lat, gs_lng in q:
-        x[i] = gs_lng
-        y[i] = gs_lat
-        i += 1
+    clusters_colors = {}  # cluster ID -> random color value
 
-    plt.scatter(x, y, color='red')
+    data = []
+    for lastname, cluster_id, gs_lat, gs_lng in q:
+        if cluster_id not in clusters_colors:
+            clusters_colors[cluster_id] = random.randint(0, count)
+
+        data.append((lastname, cluster_id, clusters_colors[cluster_id], Point(gs_lng, gs_lat)))
+
+    pts_df = gpd.GeoDataFrame(data, columns=["LastName", "ClusterId", "ColorId", "Geometry"], geometry="Geometry")
+    pts_df.plot(ax=ax, column="ColorId", cmap="hsv")
 
     plt.show()
 
