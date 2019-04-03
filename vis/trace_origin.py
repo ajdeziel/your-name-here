@@ -46,10 +46,9 @@ def trace_origin(session, family_name):
     # Use death year as colour identifier
     cities = gpd.GeoDataFrame(data, columns=["OriginLine", "ColourId"], geometry="OriginLine")
     cities.plot(ax=ax, column="ColourId", cmap="hsv")
-    # cities = gpd.GeoSeries([LineString([(lat_b, long_b), (lat_d, long_d)])
-    #                         for (lat_b, long_b), (lat_d, long_d) in cities_geo])
 
-    # cities.plot(ax=ax, color='black')
+    plt.title("%s Immigration Routes" % family_name)
+
     plt.show()
 
 
