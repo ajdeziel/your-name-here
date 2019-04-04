@@ -37,6 +37,8 @@ def show_clusters(session):
     pts_df = gpd.GeoDataFrame(data, columns=["LastName", "ClusterId", "ColorId", "Geometry"], geometry="Geometry")
     pts_df.plot(ax=ax, column="ColorId", cmap="hsv", marker=".")
 
+    plt.title("Ross Bay Cemetery Plot Grid")
+
     plt.show()
 
 
