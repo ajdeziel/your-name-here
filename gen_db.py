@@ -27,11 +27,9 @@ def gen_db():
     do_clustering(session)
     post_process(session)
 
-    # INTENTIONALLY COMMENTED OUT
     # Using find_places requires a google maps API key to geocode places of
     # birth and death. This information is included with the project database
     # in our submission .zip file.
-    #
     if os.environ.get("GOOGLEMAPS_API_KEY"):
         print("# Find places")
         find_places(session)
