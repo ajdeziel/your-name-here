@@ -26,7 +26,6 @@ def gen_db():
     print("# Run clustering")
     do_clustering(session)
     post_process(session)
-    session.commit()
 
     # INTENTIONALLY COMMENTED OUT
     # Using find_places requires a google maps API key to geocode places of
@@ -38,6 +37,8 @@ def gen_db():
         find_places(session)
     else:
         print("GOOGLEMAPS_API_KEY not defined. Not getting geocoding information!")
+
+    session.commit()
 
 
 if __name__ == "__main__":
