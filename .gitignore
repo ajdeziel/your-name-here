@@ -7,14 +7,5 @@ venv/
 # PyCharm files
 .idea/
 
-# CSV data
-*.csv
-
-# Generated database files
-*.db
-
-# KML files
-*.kml
-
 # ZIP files
 *.zip

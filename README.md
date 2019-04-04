@@ -1,8 +1,6 @@
 # YourNameHere
 #### _Making genealogy, simplified for all_.
 
-#### Our app is in development! Check it out [here](http://yournamehere.herokuapp.com).
-
 This application was constructed as part of a course project for SENG 474 (Data Mining)
 at the University of Victoria, during the months from January to April 2019.
 
@@ -14,3 +12,7 @@ at the University of Victoria, during the months from January to April 2019.
 Our full technical report is available for viewing on [Google Docs](https://docs.google.com/document/d/19MDuBIBiprdEkjVKmGyASPpxfbHw2RC0aF55ljVxJ8A/edit?usp=sharing).
 It contains our methods surrounding the construction of this application, data mining methods
 and techniques employed, as well as certain design decisions that we took.
+
+## Notable Files
+
+
