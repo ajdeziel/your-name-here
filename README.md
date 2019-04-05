@@ -18,6 +18,11 @@ and techniques employed, as well as certain design decisions that we took.
 This repository consists of several scripts to gather and cluster death records into a SQLite database. A pre-generated
 version of the database is included (`proj_data.db`), but you can also generate one using `gen_db.py`.
 
+If you're having trouble running any scripts in this repository, be sure the **root** of the project is in your PYTHONPATH.
+```bash
+$ export PYTHONPATH=$PYTHONPATH:`pwd`
+```
+
 **Notable Files**:
 * `db/db_generator.py`: Adds all data from our input datasets into a SQLite database.
 * `db/clustering.py`: Contains our core clustering algorithm for death records.
